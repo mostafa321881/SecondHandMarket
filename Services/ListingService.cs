@@ -44,4 +44,9 @@ public class ListingService
 
         return listing;
     }
+
+public List<Listing> GetAllListings()
+{
+    return Listings;
+}
 }
