@@ -11,6 +11,7 @@ public class MenuUI
     private readonly UserService _userService;
     private readonly ListingService _listingService;
     private readonly AuthUI _authUI;
+    private readonly ListingUI _listingUI;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MenuUI"/> class.
@@ -22,6 +23,7 @@ public class MenuUI
         _userService = userService;
         _listingService = listingService;
         _authUI = new AuthUI(userService);
+        _listingUI = new ListingUI(listingService, userService);
     }
 
     /// <summary>
@@ -71,12 +73,12 @@ public class MenuUI
                 switch (input)
                 {
                     case "1":
-                        Console.WriteLine("Create Listing - coming next.");
+                        _listingUI.CreateListing();
                         Pause();
                         break;
 
                     case "2":
-                        Console.WriteLine("Browse Listings - coming next.");
+                        _listingUI.BrowseListings();
                         Pause();
                         break;
 
@@ -86,7 +88,7 @@ public class MenuUI
                         break;
 
                     case "4":
-                        Console.WriteLine("My Listings - coming next.");
+                        _listingUI.ShowMyListings();
                         Pause();
                         break;
 
