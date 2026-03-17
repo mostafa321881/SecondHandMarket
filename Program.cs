@@ -1,6 +1,5 @@
-﻿using System;
-using SecondHandMarket.Services;
-
+﻿using SecondHandMarket.Services;
+using SecondHandMarket.UI;
 
 namespace SecondHandMarket;
 
@@ -11,6 +10,7 @@ class Program
         var userService = new UserService();
         var listingService = new ListingService();
 
-        
+        var menu = new MenuUI(userService, listingService);
+        menu.Start();
     }
 }
