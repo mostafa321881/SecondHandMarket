@@ -10,6 +10,7 @@ public class MenuUI
 {
     private readonly UserService _userService;
     private readonly ListingService _listingService;
+    private readonly PurchaseService _purchaseService;
     private readonly AuthUI _authUI;
     private readonly ListingUI _listingUI;
 
@@ -18,12 +19,17 @@ public class MenuUI
     /// </summary>
     /// <param name="userService">The user service.</param>
     /// <param name="listingService">The listing service.</param>
-    public MenuUI(UserService userService, ListingService listingService)
+    /// <param name="purchaseService">The purchase service.</param>
+    public MenuUI(
+        UserService userService,
+        ListingService listingService,
+        PurchaseService purchaseService)
     {
         _userService = userService;
         _listingService = listingService;
+        _purchaseService = purchaseService;
         _authUI = new AuthUI(userService);
-        _listingUI = new ListingUI(listingService, userService);
+        _listingUI = new ListingUI(listingService, userService, purchaseService);
     }
 
     /// <summary>
@@ -136,7 +142,7 @@ public class MenuUI
         Console.WriteLine("=== Main Menu ===");
         Console.WriteLine($"Logged in as: {_userService.CurrentUser!.Username}");
         Console.WriteLine("1. Create Listing");
-        Console.WriteLine("2. Browse Listings");
+        Console.WriteLine("2. Browse Listings / Buy Listing");
         Console.WriteLine("3. Search Listings");
         Console.WriteLine("4. My Listings");
         Console.WriteLine("5. My Purchases");
