@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SecondHandMarket.Enums;
 using SecondHandMarket.Models;
 using SecondHandMarket.Services;
@@ -13,16 +14,22 @@ public class ListingUI
 {
     private readonly ListingService _listingService;
     private readonly UserService _userService;
+    private readonly PurchaseService _purchaseService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ListingUI"/> class.
     /// </summary>
     /// <param name="listingService">The listing service.</param>
     /// <param name="userService">The user service.</param>
-    public ListingUI(ListingService listingService, UserService userService)
+    /// <param name="purchaseService">The purchase service.</param>
+    public ListingUI(
+        ListingService listingService,
+        UserService userService,
+        PurchaseService purchaseService)
     {
         _listingService = listingService;
         _userService = userService;
+        _purchaseService = purchaseService;
     }
 
     /// <summary>
@@ -112,34 +119,70 @@ public class ListingUI
     }
 
     /// <summary>
-    /// Displays all available listings.
+    /// Displays all available listings and allows the user to purchase one.
     /// </summary>
     public void BrowseListings()
     {
-        List<Listing> listings = _listingService.GetAllListings();
-
-        if (listings.Count == 0)
+        try
         {
-            Console.WriteLine("No listings available.");
-            return;
-        }
+            List<Listing> availableListings = _listingService
+                .GetAllListings()
+                .Where(listing => listing.Status == ListingStatus.Available)
+                .ToList();
 
-        Console.WriteLine("=== Available Listings ===");
-
-        int number = 1;
-        foreach (var listing in listings)
-        {
-            if (listing.Status == ListingStatus.Available)
+            if (availableListings.Count == 0)
             {
-                Console.WriteLine(
-                    $"{number}. {listing.Title} | {listing.Category} | {listing.Condition} | {listing.Price} NOK");
-                number++;
+                Console.WriteLine("No available listings found.");
+                return;
             }
-        }
 
-        if (number == 1)
+            Console.WriteLine("=== Available Listings ===");
+
+            for (int i = 0; i < availableListings.Count; i++)
+            {
+                var listing = availableListings[i];
+                Console.WriteLine(
+                    $"{i + 1}. {listing.Title} | Seller: {listing.Seller.Username} | {listing.Category} | {listing.Condition} | {listing.Price} NOK");
+            }
+
+            Console.Write("\nEnter listing number to buy (0 to go back): ");
+            string input = Console.ReadLine() ?? string.Empty;
+
+            if (!int.TryParse(input, out int choice))
+            {
+                Console.WriteLine("Invalid selection.");
+                return;
+            }
+
+            if (choice == 0)
+            {
+                return;
+            }
+
+            if (choice < 1 || choice > availableListings.Count)
+            {
+                Console.WriteLine("Invalid listing number.");
+                return;
+            }
+
+            if (_userService.CurrentUser is null)
+            {
+                Console.WriteLine("You must be logged in to purchase a listing.");
+                return;
+            }
+
+            Listing selectedListing = availableListings[choice - 1];
+
+            var transaction = _purchaseService.PurchaseListing(
+                _userService.CurrentUser,
+                selectedListing);
+
+            Console.WriteLine(
+                $"Purchase complete! You bought '{transaction.Listing.Title}' from {transaction.Seller.Username}.");
+        }
+        catch (Exception ex)
         {
-            Console.WriteLine("No available listings found.");
+            Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
