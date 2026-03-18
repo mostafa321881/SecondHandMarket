@@ -52,7 +52,7 @@ public class ListingUI
             string description = Console.ReadLine() ?? string.Empty;
 
             Console.WriteLine("\nAvailable categories:");
-            var categories = Enum.GetValues<Category>();
+            Category[] categories = Enum.GetValues<Category>();
 
             for (int i = 0; i < categories.Length; i++)
             {
@@ -73,7 +73,7 @@ public class ListingUI
             Category categoryValue = categories[categoryChoice - 1];
 
             Console.WriteLine("\nAvailable conditions:");
-            var conditions = Enum.GetValues<Condition>();
+            Condition[] conditions = Enum.GetValues<Condition>();
 
             for (int i = 0; i < conditions.Length; i++)
             {
@@ -102,7 +102,7 @@ public class ListingUI
                 return;
             }
 
-            var listing = _listingService.CreateListing(
+            Listing listing = _listingService.CreateListing(
                 _userService.CurrentUser,
                 title,
                 description,
@@ -140,7 +140,7 @@ public class ListingUI
 
             for (int i = 0; i < availableListings.Count; i++)
             {
-                var listing = availableListings[i];
+                Listing listing = availableListings[i];
                 Console.WriteLine(
                     $"{i + 1}. {listing.Title} | Seller: {listing.Seller.Username} | {listing.Category} | {listing.Condition} | {listing.Price} NOK");
             }
@@ -173,12 +173,153 @@ public class ListingUI
 
             Listing selectedListing = availableListings[choice - 1];
 
-            var transaction = _purchaseService.PurchaseListing(
+            Transaction transaction = _purchaseService.PurchaseListing(
                 _userService.CurrentUser,
                 selectedListing);
 
             Console.WriteLine(
                 $"Purchase complete! You bought '{transaction.Listing.Title}' from {transaction.Seller.Username}.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Searches available listings using optional filters.
+    /// </summary>
+    public void SearchListings()
+    {
+        try
+        {
+            Console.WriteLine("=== Search Listings ===");
+
+            Console.Write("Enter keyword (or leave blank): ");
+            string? keyword = Console.ReadLine();
+
+            Category? selectedCategory = null;
+            Console.Write("Filter by category? (y/n): ");
+            string categoryChoice = (Console.ReadLine() ?? string.Empty).Trim().ToLower();
+
+            if (categoryChoice == "y")
+            {
+                Category[] categories = Enum.GetValues<Category>();
+
+                Console.WriteLine("\nAvailable categories:");
+                for (int i = 0; i < categories.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {categories[i]}");
+                }
+
+                Console.Write("Select category number: ");
+                string categoryInput = Console.ReadLine() ?? string.Empty;
+
+                if (int.TryParse(categoryInput, out int categoryIndex) &&
+                    categoryIndex >= 1 &&
+                    categoryIndex <= categories.Length)
+                {
+                    selectedCategory = categories[categoryIndex - 1];
+                }
+                else
+                {
+                    Console.WriteLine("Invalid category selection.");
+                    return;
+                }
+            }
+
+            Condition? selectedCondition = null;
+            Console.Write("Filter by condition? (y/n): ");
+            string conditionChoice = (Console.ReadLine() ?? string.Empty).Trim().ToLower();
+
+            if (conditionChoice == "y")
+            {
+                Condition[] conditions = Enum.GetValues<Condition>();
+
+                Console.WriteLine("\nAvailable conditions:");
+                for (int i = 0; i < conditions.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {conditions[i]}");
+                }
+
+                Console.Write("Select condition number: ");
+                string conditionInput = Console.ReadLine() ?? string.Empty;
+
+                if (int.TryParse(conditionInput, out int conditionIndex) &&
+                    conditionIndex >= 1 &&
+                    conditionIndex <= conditions.Length)
+                {
+                    selectedCondition = conditions[conditionIndex - 1];
+                }
+                else
+                {
+                    Console.WriteLine("Invalid condition selection.");
+                    return;
+                }
+            }
+
+            decimal? minPrice = null;
+            Console.Write("Enter minimum price (or leave blank): ");
+            string minInput = Console.ReadLine() ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(minInput))
+            {
+                if (decimal.TryParse(minInput, out decimal minValue) && minValue >= 0)
+                {
+                    minPrice = minValue;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid minimum price.");
+                    return;
+                }
+            }
+
+            decimal? maxPrice = null;
+            Console.Write("Enter maximum price (or leave blank): ");
+            string maxInput = Console.ReadLine() ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(maxInput))
+            {
+                if (decimal.TryParse(maxInput, out decimal maxValue) && maxValue >= 0)
+                {
+                    maxPrice = maxValue;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid maximum price.");
+                    return;
+                }
+            }
+
+            if (minPrice.HasValue && maxPrice.HasValue && minPrice.Value > maxPrice.Value)
+            {
+                Console.WriteLine("Minimum price cannot be greater than maximum price.");
+                return;
+            }
+
+            List<Listing> results = _listingService.SearchListings(
+                keyword,
+                selectedCategory,
+                selectedCondition,
+                minPrice,
+                maxPrice);
+
+            Console.WriteLine();
+            Console.WriteLine("=== Search Results ===");
+
+            if (results.Count == 0)
+            {
+                Console.WriteLine("No matching listings found.");
+                return;
+            }
+
+            for (int i = 0; i < results.Count; i++)
+            {
+                Listing listing = results[i];
+                Console.WriteLine(
+                    $"{i + 1}. {listing.Title} | Seller: {listing.Seller.Username} | {listing.Category} | {listing.Condition} | {listing.Price} NOK");
+            }
         }
         catch (Exception ex)
         {
@@ -208,7 +349,7 @@ public class ListingUI
         Console.WriteLine("=== My Listings ===");
 
         int number = 1;
-        foreach (var listing in myListings)
+        foreach (Listing listing in myListings)
         {
             Console.WriteLine(
                 $"{number}. {listing.Title} | {listing.Category} | {listing.Condition} | {listing.Price} NOK | {listing.Status}");
