@@ -356,4 +356,84 @@ public class ListingUI
             number++;
         }
     }
+    public void ManageMyListings()
+{
+    if (_userService.CurrentUser is null)
+    {
+        Console.WriteLine("You must be logged in.");
+        return;
+    }
+
+    List<Listing> myListings = _userService.CurrentUser.Listings;
+
+    if (myListings.Count == 0)
+    {
+        Console.WriteLine("You have no listings.");
+        return;
+    }
+
+    Console.WriteLine("=== Manage My Listings ===");
+
+    for (int i = 0; i < myListings.Count; i++)
+    {
+        Listing l = myListings[i];
+        Console.WriteLine($"{i + 1}. {l.Title} | {l.Price} NOK | {l.Status}");
+    }
+
+    Console.Write("Select listing (0 to cancel): ");
+    if (!int.TryParse(Console.ReadLine(), out int choice) ||
+        choice < 0 || choice > myListings.Count)
+    {
+        Console.WriteLine("Invalid choice.");
+        return;
+    }
+
+    if (choice == 0)
+        return;
+
+    Listing selected = myListings[choice - 1];
+
+    Console.WriteLine("1. Edit");
+    Console.WriteLine("2. Remove");
+    Console.Write("Choose option: ");
+    string action = Console.ReadLine() ?? "";
+
+    try
+    {
+        if (action == "1")
+        {
+            Console.Write("New title: ");
+            string title = Console.ReadLine() ?? "";
+
+            Console.Write("New description: ");
+            string desc = Console.ReadLine() ?? "";
+
+            Console.Write("New price: ");
+            decimal price = decimal.Parse(Console.ReadLine() ?? "0");
+
+            _listingService.UpdateListing(
+                selected,
+                _userService.CurrentUser,
+                title,
+                desc,
+                selected.Category,
+                selected.Condition,
+                price);
+
+            Console.WriteLine("Listing updated.");
+        }
+        else if (action == "2")
+        {
+            _listingService.RemoveListing(
+                selected,
+                _userService.CurrentUser);
+
+            Console.WriteLine("Listing removed.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+}
 }
