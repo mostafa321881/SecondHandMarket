@@ -35,10 +35,12 @@ public class ListingService
         Condition condition,
         decimal price)
     {
-        if (seller == null)
+        if (seller is null)
+        {
             throw new ArgumentNullException(nameof(seller));
+        }
 
-        var listing = new Listing(title, description, category, condition, price, seller);
+        Listing listing = new Listing(title, description, category, condition, price, seller);
 
         Listings.Add(listing);
         seller.Listings.Add(listing);
@@ -57,6 +59,12 @@ public class ListingService
     /// <summary>
     /// Searches and filters available listings using LINQ.
     /// </summary>
+    /// <param name="keyword">The keyword to search in title or description.</param>
+    /// <param name="category">The optional category filter.</param>
+    /// <param name="condition">The optional condition filter.</param>
+    /// <param name="minPrice">The optional minimum price.</param>
+    /// <param name="maxPrice">The optional maximum price.</param>
+    /// <returns>A list of matching available listings.</returns>
     public List<Listing> SearchListings(
         string? keyword,
         Category? category,
@@ -64,36 +72,35 @@ public class ListingService
         decimal? minPrice,
         decimal? maxPrice)
     {
-        var query = Listings
-            .Where(l => l.Status == ListingStatus.Available);
+        IEnumerable<Listing> query = Listings.Where(listing => listing.Status == ListingStatus.Available);
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             string term = keyword.Trim().ToLower();
 
-            query = query.Where(l =>
-                l.Title.ToLower().Contains(term) ||
-                l.Description.ToLower().Contains(term));
+            query = query.Where(listing =>
+                listing.Title.ToLower().Contains(term) ||
+                listing.Description.ToLower().Contains(term));
         }
 
         if (category.HasValue)
         {
-            query = query.Where(l => l.Category == category.Value);
+            query = query.Where(listing => listing.Category == category.Value);
         }
 
         if (condition.HasValue)
         {
-            query = query.Where(l => l.Condition == condition.Value);
+            query = query.Where(listing => listing.Condition == condition.Value);
         }
 
         if (minPrice.HasValue)
         {
-            query = query.Where(l => l.Price >= minPrice.Value);
+            query = query.Where(listing => listing.Price >= minPrice.Value);
         }
 
         if (maxPrice.HasValue)
         {
-            query = query.Where(l => l.Price <= maxPrice.Value);
+            query = query.Where(listing => listing.Price <= maxPrice.Value);
         }
 
         return query.ToList();

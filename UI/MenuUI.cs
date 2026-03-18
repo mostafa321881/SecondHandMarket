@@ -95,7 +95,7 @@ public class MenuUI
                         break;
 
                     case "3":
-                        Console.WriteLine("Search Listings - coming next.");
+                        _listingUI.SearchListings();
                         Pause();
                         break;
 
