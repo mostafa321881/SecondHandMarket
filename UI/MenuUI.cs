@@ -100,7 +100,7 @@ public class MenuUI
                         break;
 
                     case "4":
-                        _listingUI.ShowMyListings();
+                        _listingUI.ManageMyListings();
                         Pause();
                         break;
 
