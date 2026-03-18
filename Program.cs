@@ -11,10 +11,16 @@ class Program
         var userService = new UserService();
         var listingService = new ListingService();
         var purchaseService = new PurchaseService();
+        var reviewService = new ReviewService();
 
         SeedTestData(userService, listingService);
 
-        var menu = new MenuUI(userService, listingService, purchaseService);
+        var menu = new MenuUI(
+            userService,
+            listingService,
+            purchaseService,
+            reviewService);
+
         menu.Start();
     }
 
