@@ -13,6 +13,7 @@ public class MenuUI
     private readonly PurchaseService _purchaseService;
     private readonly AuthUI _authUI;
     private readonly ListingUI _listingUI;
+    private readonly TransactionUI _transactionUI;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MenuUI"/> class.
@@ -30,6 +31,7 @@ public class MenuUI
         _purchaseService = purchaseService;
         _authUI = new AuthUI(userService);
         _listingUI = new ListingUI(listingService, userService, purchaseService);
+        _transactionUI = new TransactionUI(purchaseService, userService);
     }
 
     /// <summary>
@@ -99,7 +101,7 @@ public class MenuUI
                         break;
 
                     case "5":
-                        Console.WriteLine("My Purchases - coming next.");
+                        _transactionUI.ShowTransactionHistoryMenu();
                         Pause();
                         break;
 
@@ -145,7 +147,7 @@ public class MenuUI
         Console.WriteLine("2. Browse Listings / Buy Listing");
         Console.WriteLine("3. Search Listings");
         Console.WriteLine("4. My Listings");
-        Console.WriteLine("5. My Purchases");
+        Console.WriteLine("5. Transaction History");
         Console.WriteLine("6. My Reviews");
         Console.WriteLine("7. Log Out");
         Console.Write("Select an option: ");

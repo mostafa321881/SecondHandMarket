@@ -8,6 +8,22 @@ namespace SecondHandMarket.Models;
 public class Transaction
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="Transaction"/> class.
+    /// </summary>
+    /// <param name="listing">The purchased listing.</param>
+    /// <param name="buyer">The buyer.</param>
+    /// <param name="seller">The seller.</param>
+    public Transaction(Listing listing, User buyer, User seller)
+    {
+        Listing = listing ?? throw new ArgumentNullException(nameof(listing));
+        Buyer = buyer ?? throw new ArgumentNullException(nameof(buyer));
+        Seller = seller ?? throw new ArgumentNullException(nameof(seller));
+
+        Price = listing.Price;
+        PurchasedAt = DateTime.Now;
+    }
+
+    /// <summary>
     /// Gets the listing that was purchased.
     /// </summary>
     public Listing Listing { get; }
@@ -23,27 +39,19 @@ public class Transaction
     public User Seller { get; }
 
     /// <summary>
-    /// Gets the final transaction price.
+    /// Gets the final agreed transaction price.
+    /// This value is stored to preserve historical accuracy.
     /// </summary>
     public decimal Price { get; }
 
     /// <summary>
-    /// Gets the date and time when the transaction happened.
+    /// Gets the date and time when the purchase occurred.
     /// </summary>
     public DateTime PurchasedAt { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Transaction"/> class.
+    /// Gets or sets a value indicating whether a review has been left for this transaction.
+    /// (Used later in the review feature.)
     /// </summary>
-    /// <param name="listing">The purchased listing.</param>
-    /// <param name="buyer">The buyer.</param>
-    /// <param name="seller">The seller.</param>
-    public Transaction(Listing listing, User buyer, User seller)
-    {
-        Listing = listing ?? throw new ArgumentNullException(nameof(listing));
-        Buyer = buyer ?? throw new ArgumentNullException(nameof(buyer));
-        Seller = seller ?? throw new ArgumentNullException(nameof(seller));
-        Price = listing.Price;
-        PurchasedAt = DateTime.Now;
-    }
+    public bool HasReview { get; set; }
 }
