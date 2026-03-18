@@ -41,6 +41,11 @@ public class User
     public List<Review> ReviewsReceived { get; }
 
     /// <summary>
+    /// Gets the reviews written by the user as a buyer.
+    /// </summary>
+    public List<Review> ReviewsWritten { get; }
+
+    /// <summary>
     /// Gets the average seller rating for the user.
     /// Returns 0 if the user has no reviews.
     /// </summary>
@@ -72,5 +77,6 @@ public class User
         Purchases = new List<Transaction>();
         Sales = new List<Transaction>();
         ReviewsReceived = new List<Review>();
+        ReviewsWritten = new List<Review>();
     }
 }

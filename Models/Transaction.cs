@@ -21,6 +21,7 @@ public class Transaction
 
         Price = listing.Price;
         PurchasedAt = DateTime.Now;
+        HasReview = false;
     }
 
     /// <summary>
@@ -51,7 +52,6 @@ public class Transaction
 
     /// <summary>
     /// Gets or sets a value indicating whether a review has been left for this transaction.
-    /// (Used later in the review feature.)
     /// </summary>
     public bool HasReview { get; set; }
 }

@@ -14,6 +14,7 @@ public class MenuUI
     private readonly AuthUI _authUI;
     private readonly ListingUI _listingUI;
     private readonly TransactionUI _transactionUI;
+    private readonly ReviewUI _reviewUI;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MenuUI"/> class.
@@ -21,10 +22,12 @@ public class MenuUI
     /// <param name="userService">The user service.</param>
     /// <param name="listingService">The listing service.</param>
     /// <param name="purchaseService">The purchase service.</param>
+    /// <param name="reviewService">The review service.</param>
     public MenuUI(
         UserService userService,
         ListingService listingService,
-        PurchaseService purchaseService)
+        PurchaseService purchaseService,
+        ReviewService reviewService)
     {
         _userService = userService;
         _listingService = listingService;
@@ -32,6 +35,7 @@ public class MenuUI
         _authUI = new AuthUI(userService);
         _listingUI = new ListingUI(listingService, userService, purchaseService);
         _transactionUI = new TransactionUI(purchaseService, userService);
+        _reviewUI = new ReviewUI(reviewService, userService, purchaseService);
     }
 
     /// <summary>
@@ -106,7 +110,7 @@ public class MenuUI
                         break;
 
                     case "6":
-                        Console.WriteLine("My Reviews - coming next.");
+                        _reviewUI.ShowReviewMenu();
                         Pause();
                         break;
 
